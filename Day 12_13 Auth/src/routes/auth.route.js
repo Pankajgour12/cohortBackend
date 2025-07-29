@@ -11,7 +11,7 @@ POST/user
 POST/logout
 
 */
-router.get("/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   const { username, password } = req.body;
 
   const user = await userModel.create({
@@ -25,4 +25,28 @@ router.get("/register", async (req, res) => {
   });
 });
 
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  const user = await userModel.findOne({
+    username: username,
+  });
+
+  if (!user)
+    return res.status(401).json({
+      message: "User Account is not Found [invalid username]",
+    });
+
+  const isPasswordValid = password == user.password;
+
+  if (!isPasswordValid) {
+    return res.status(401).json({
+      message: "Password is Invalid",
+    });
+  }
+
+  res.status(200).json({
+    message: "User LoggedIn Successfully",
+  });
+});
 module.exports = router;
